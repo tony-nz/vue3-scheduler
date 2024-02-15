@@ -1,13 +1,13 @@
-# Vue3, Vite, and TypeScript Boilerplate
+# Vue3 Scheduler
 
-This is a simple boilerplate for creating Vue3 applications using the Vite build tool and TypeScript language.
+📅 Vue.js component for building interactive and customizable schedules.
 
 ## Getting Started
 
 To get started with this boilerplate, simply clone this repository and install the dependencies:
 
-`git clone https://github.com/your-username/vue3-vite-typescript-boilerplate.git
-cd vue3-vite-typescript-boilerplate
+`git clone https://github.com/tony-nz/vue3-scheduler.git
+cd vue3-scheduler
 npm install`
 
 You can then start the development server:
