@@ -1,4 +1,17 @@
 <template>
+  <div class="container mx-auto">
+    <!-- github link -->
+    <div class="container mx-auto flex justify-end mt-4">
+      <a
+        href="https://github.com/tony-nz/vue3-scheduler"
+        target="_blank"
+        class="text-xs text-gray-400"
+      >
+        <span class="mr-2">Created by Tony Myers</span>
+        <img src="/github.svg" alt="github" class="w-4 h-4 inline-block mr-2" />
+      </a>
+    </div>
+  </div>
   <VueScheduler
     :data="timelineData"
     :headers="timelineHeaders"
