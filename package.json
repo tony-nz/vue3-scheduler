@@ -1,7 +1,7 @@
 {
-  "name": "vue-vite-typescript-boilerplate",
+  "name": "vue3-scheduler",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
@@ -10,8 +10,7 @@
     "format": "prettier .  --write"
   },
   "dependencies": {
-    "vue": "^3.2.47",
-    "vuedraggable": "^4.1.0"
+    "vue": "^3.2.47"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.50.0",
