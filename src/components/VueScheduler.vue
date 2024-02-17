@@ -160,7 +160,6 @@ interface TimelineItem {
   start: string;
   end: string;
   row: number;
-  // Add other properties as needed
 }
 interface IItem {
   start: string;
@@ -245,7 +244,7 @@ export default defineComponent({
      */
     const eventProperties = computed(() => {
       return props.data.map((event) => {
-        const { start, end, row } = event as IItem;
+        const { start, end, row } = event as TimelineItem;
         const [startHour, startMinutes] = start.split(":");
         const [endHour, endMinutes] = end.split(":");
         const startInMinutes =
@@ -260,9 +259,6 @@ export default defineComponent({
         const eventWidth =
           ((endInMinutes - startInMinutes) / (scale.value * 60)) *
           cellWidth.value;
-
-        // convert scale (0.25) to time (15)
-
         const top = row * rowHeight.value + (row + 1) * 1;
         const left =
           (parseInt(startHour) * 60 + parseInt(startMinutes)) *
