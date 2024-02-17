@@ -32,6 +32,12 @@ export default defineComponent({
   },
   setup() {
     /**
+     * Today's date
+     */
+    const start = new Date();
+    const end = new Date();
+
+    /**
      * Timeline data
      */
     const timelineData = ref<TimelineItem[]>([
@@ -159,8 +165,8 @@ export default defineComponent({
       cellWidth: 50,
       rowHeight: 60,
       scale: 0.5,
-      start: "00:00",
-      end: "23:59",
+      start: new Date(start.setHours(0, 0, 0)),
+      end: new Date(end.setHours(23, 59, 59)),
     });
 
     return {

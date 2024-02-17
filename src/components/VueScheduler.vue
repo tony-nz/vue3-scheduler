@@ -176,8 +176,25 @@ export default defineComponent({
         cellWidth: 50,
         rowHeight: 60,
         scale: 0.5,
-        start: "00:00",
-        end: "24:00",
+        start: new Date()
+          .toLocaleString("en-NZ", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+          .replace(",", ""),
+        end: new Date()
+          .toLocaleString("en-NZ", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+          .replace(/\d+:\d+$/, "23:59")
+          .replace(",", ""),
       }),
     },
   },
@@ -188,7 +205,9 @@ export default defineComponent({
     const rowHeight = ref(props.options.rowHeight);
     const scale = ref(props.options.scale);
     const showVerticalLine = ref(false);
-    const timeline = computed(() => generateTimeline(scale.value));
+    const timeline = computed(() =>
+      generateTimeline(scale.value, props.options.start, props.options.end)
+    );
     const verticalLineX = ref(0);
 
     /**
@@ -207,12 +226,17 @@ export default defineComponent({
      * @param scale
      * @returns {Array} Array of strings representing the time slots
      */
-    function generateTimeline(scale: number) {
-      const startTime = 0; // Assuming start time is 00:00
-      const endTime = 24 * 60; // Assuming end time is 23:00 converted to minutes
+    function generateTimeline(scale: number, startTime: Date, endTime: Date) {
+      const startDateTime = new Date(startTime);
+      const endDateTime = new Date(endTime);
+
+      // Convert start and end times to minutes
+      const startMinutes =
+        startDateTime.getHours() * 60 + startDateTime.getMinutes();
+      const endMinutes = endDateTime.getHours() * 60 + endDateTime.getMinutes();
 
       const timeSlots = [];
-      for (let time = startTime; time <= endTime; time += scale * 60) {
+      for (let time = startMinutes; time <= endMinutes; time += scale * 60) {
         timeSlots.push(formatTime(time));
       }
 
