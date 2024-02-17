@@ -116,22 +116,17 @@
                   left: `${eventProperties[index].left}px`,
                   top: `${eventProperties[index].top}px`,
                 }"
-                @dragstart="startDrag($event, timeline)"
-                @dragover.prevent="dragOverRow = index"
-                @dragenter.prevent="dragOverRow = index"
-                @dragleave.prevent="dragOverRow = null"
-                @drop="onDrop($event, timeline)"
               >
                 <div class="p-1">
                   <div>start: {{ timeline.start }}</div>
                   <div>end: {{ timeline.end }}</div>
                 </div>
               </div>
-              <div v-for="(row, index) in items" :key="index" class="flex">
+              <div v-for="(_row, index) in items" :key="index" class="flex">
                 <div
                   v-for="(_time, timeIdx) in timeline"
                   :key="timeIdx"
-                  class="drop-zone text-center relative mt-px p-2.5 border-r bg-white text-xs text-white leading-10 text-medium"
+                  class="text-center relative mt-px p-2.5 border-r bg-white text-xs text-white leading-10 text-medium"
                   :style="
                     'min-width: ' +
                     cellWidth +
@@ -146,9 +141,6 @@
                     rowHeight +
                     'px; '
                   "
-                  @drop="onDrop($event, row)"
-                  @dragover.prevent
-                  @dragenter.prevent
                 />
               </div>
             </div>
@@ -196,8 +188,6 @@ export default defineComponent({
     const cellWidth = ref(50);
     const clicksDown = ref(0);
     const clicksUp = ref(0);
-    const draggingItem = ref<TimelineItem | null>(null);
-    const dragOverRow = ref<number | null>(null);
     const rowHeight = ref(60);
     const scale = ref(0.5);
     const showVerticalLine = ref(false);
@@ -339,48 +329,17 @@ export default defineComponent({
       showVerticalLine.value = false;
     };
 
-    /**
-     * Start dragging the event
-     * @param evt
-     * @param item
-     */
-    const startDrag = (event: DragEvent, item: TimelineItem) => {
-      if (!event.dataTransfer) return;
-      event.dataTransfer.dropEffect = "move";
-      event.dataTransfer.effectAllowed = "move";
-      draggingItem.value = item;
-    };
-
-    /**
-     * Drop the event
-     * @param evt
-     * @param index
-     */
-    const onDrop = (event: DragEvent, row: unknown) => {
-      if (draggingItem.value) {
-        console.log(event, row);
-        // Move the dragged item to the new row
-        // draggingItem.value.row = index - 1;
-        // draggingItem.value = null;
-        // dragOverRow.value = null;
-      }
-    };
-
     return {
       cellWidth,
-      draggingItem,
-      dragOverRow,
       eventProperties,
       getCurrentTimePosition,
       getTimeOfDay,
       handleMouseMove,
       handleMouseLeave,
-      onDrop,
       onWheel,
       rowHeight,
       scale,
       showVerticalLine,
-      startDrag,
       timeline,
       verticalLineX,
     };
