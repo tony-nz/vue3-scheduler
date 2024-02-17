@@ -137,6 +137,7 @@ export default defineComponent({
      * Timeline headers
      */
     const timelineHeaders = ref(["Route", "Start time"]);
+
     /**
      * Generate row data
      */
