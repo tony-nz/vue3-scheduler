@@ -5,7 +5,7 @@
     <div class="bg-white grid rounded-lg max-w-6xl p-6 overscroll-none">
       <div class="flex flex-row justify-between p-4">
         <h1 class="text-2xl font-bold">Scheduler</h1>
-        <div>Scale: {{ scale }} ({{ scale * 60 }}min)</div>
+        <div>Scale: {{ scale }} ({{ getScaleTime(scale) }})</div>
       </div>
       <div
         id="main-timeline"
@@ -393,10 +393,24 @@ export default defineComponent({
       showVerticalLine.value = false;
     };
 
+    /**
+     * Convert scale to minutes, hours
+     */
+    const getScaleTime = (scale: number) => {
+      const time = scale * 60;
+
+      if (time < 60) {
+        return `${time}min`;
+      } else {
+        return `${time / 60}h`;
+      }
+    };
+
     return {
       cellWidth,
       eventProperties,
       getCurrentTimePosition,
+      getScaleTime,
       getTimeOfDay,
       handleMouseMove,
       handleMouseLeave,
