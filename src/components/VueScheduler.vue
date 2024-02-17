@@ -205,16 +205,33 @@ export default defineComponent({
       }
       return "pm";
     };
+    /**
+     * Parse date string to Date object
+     * @param dateStr
+     * @returns {Date} Date object
+     * @example
+     * parseDate("17/02/2024 01:00")
+     */
+    const parseDate = (dateStr: string) => {
+      // eslint-disable-next-line no-useless-escape
+      const [day, month, year, hour, minutes] = dateStr.split(/[\/\s:]+/);
+      return new Date(`${year}-${month}-${day}T${hour}:${minutes}`);
+    };
 
     /**
      * Generate the timeline based on the scale
      * @param scale
      * @returns {Array} Array of strings representing the time slots
      */
-    function generateTimeline(scale: number, startTime: Date, endTime: Date) {
+    function generateTimeline(
+      scale: number,
+      startTimeStr: string,
+      endTimeStr: string
+    ) {
+      const startTime = parseDate(startTimeStr);
+      const endTime = parseDate(endTimeStr);
       const startDateTime = new Date(startTime);
       const endDateTime = new Date(endTime);
-
       const timeSlots = [];
 
       // Iterate through days
@@ -275,10 +292,21 @@ export default defineComponent({
     const eventProperties = computed(() => {
       return props.data.map((event) => {
         const { start, end, row } = event as TimelineItem;
-        const [startHour, startMinutes] = start.split(":");
-        const [endHour, endMinutes] = end.split(":");
+        const optStartDate = new Date(parseDate(props.options.start));
+
+        // Extract date and time parts
+        const [startDate, startTime] = start.split(" ");
+        const endTime = end.split(" ")[1];
+
+        const [startDay, startMonth, startYear] = startDate.split("/");
+        // const [endDay, endMonth, endYear] = endDate.split("/");
+
+        const [startHour, startMinutes] = startTime.split(":");
+        const [endHour, endMinutes] = endTime.split(":");
+
+        // Convert date and time parts to numbers
         const startInMinutes =
-          (parseInt(startHour) === parseInt("00")
+          (parseInt(startHour) === 0
             ? parseInt(startHour)
             : parseInt(startHour) - 0) *
             60 +
@@ -286,19 +314,29 @@ export default defineComponent({
         const endInMinutes = parseInt(endHour) * 60 + parseInt(endMinutes);
 
         // Calculate the width based on the scale
-        const eventWidth =
+        let eventWidth =
           ((endInMinutes - startInMinutes) / (scale.value * 60)) *
           cellWidth.value;
         const top = row * rowHeight.value + (row + 1) * 1;
-        const left =
-          (parseInt(startHour) * 60 + parseInt(startMinutes)) *
-            (cellWidth.value / (scale.value * 60)) +
-          1;
+        // Calculate left position based on date and time
+        const startDateObject = new Date(
+          `${startYear}-${startMonth}-${startDay}T${startTime}`
+        );
+        const startInMinutesOfDay =
+          startDateObject.getHours() * 60 + startDateObject.getMinutes();
+        let left =
+          (startInMinutesOfDay / (scale.value * 60)) * cellWidth.value + 1;
+
+        // check to see how many days are between the start date and the options start date
+        if (parseInt(startDay) > optStartDate.getDate()) {
+          // add the number of days between the start date and the options start date
+          left += (24 / scale.value) * cellWidth.value;
+          eventWidth += (24 / scale.value) * cellWidth.value;
+        }
 
         return { top, left, width: eventWidth };
       });
     });
-
     /**
      * Scroll to zoom in and out
      * @param e

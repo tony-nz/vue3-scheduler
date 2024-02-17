@@ -10,8 +10,8 @@ interface TimelineOptions {
   cellWidth: number;
   rowHeight: number;
   scale: number;
-  start: Date;
-  end: Date;
+  start: string;
+  end: string;
 }
 
 export type { TimelineItem, TimelineOptions };

@@ -37,6 +37,14 @@ export default defineComponent({
     const start = new Date();
     const end = new Date();
 
+    start.setDate(17);
+    start.setMonth(2);
+    start.setFullYear(2024);
+
+    end.setDate(17);
+    end.setMonth(2);
+    end.setFullYear(2024);
+
     /**
      * Add one day to the end date
      */
@@ -50,99 +58,36 @@ export default defineComponent({
         row: 0,
         background: "bg-emerald-500",
         text: "text-white",
-        start: "00:00",
-        end: "00:45",
+        start: "17/02/2024 01:00",
+        end: "17/02/2024 02:00",
       },
       {
         row: 1,
         background: "bg-orange-500",
         text: "text-white",
-        start: "01:00",
-        end: "02:30",
-      },
-      {
-        row: 2,
-        background: "bg-purple-500",
-        text: "text-white",
-        start: "01:00",
-        end: "02:35",
+        start: "17/02/2024 01:00",
+        end: "17/02/2024 02:15",
       },
       {
         row: 3,
-        background: "bg-red-500",
+        background: "bg-orange-500",
         text: "text-white",
-        start: "01:00",
-        end: "02:35",
-      },
-      {
-        row: 1,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "04:00",
-        end: "05:35",
-      },
-      {
-        row: 2,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "06:00",
-        end: "07:35",
-      },
-      {
-        row: 2,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "08:00",
-        end: "09:35",
-      },
-      {
-        row: 3,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "10:00",
-        end: "11:35",
-      },
-      {
-        row: 3,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "12:00",
-        end: "13:35",
+        start: "17/02/2024 02:24",
+        end: "17/02/2024 03:27",
       },
       {
         row: 4,
-        background: "bg-emerald-500",
+        background: "bg-orange-500",
         text: "text-white",
-        start: "14:00",
-        end: "15:35",
-      },
-      {
-        row: 4,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "16:00",
-        end: "17:35",
+        start: "18/02/2024 02:24",
+        end: "18/02/2024 03:27",
       },
       {
         row: 5,
-        background: "bg-emerald-500",
+        background: "bg-orange-500",
         text: "text-white",
-        start: "18:00",
-        end: "19:35",
-      },
-      {
-        row: 5,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "20:00",
-        end: "21:35",
-      },
-      {
-        row: 6,
-        background: "bg-emerald-500",
-        text: "text-white",
-        start: "22:00",
-        end: "23:35",
+        start: "18/02/2024 02:24",
+        end: "19/02/2024 03:27",
       },
     ]);
 
@@ -170,8 +115,8 @@ export default defineComponent({
       cellWidth: 50,
       rowHeight: 60,
       scale: 0.5,
-      start: new Date(start.setHours(0, 0, 0)),
-      end: new Date(end.setHours(23, 59, 59)),
+      start: "17/02/2024 00:00",
+      end: "19/02/2024 23:59",
     });
 
     return {
