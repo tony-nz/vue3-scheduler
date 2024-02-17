@@ -162,6 +162,14 @@ interface TimelineItem {
   row: number;
 }
 
+interface TimelineOptions {
+  cellWidth: number;
+  rowHeight: number;
+  scale: number;
+  start: string;
+  end: string;
+}
+
 export default defineComponent({
   name: "VueScheduler",
   props: {
@@ -177,13 +185,23 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    options: {
+      type: Object as PropType<TimelineOptions>,
+      default: () => ({
+        cellWidth: 50,
+        rowHeight: 60,
+        scale: 0.5,
+        start: "00:00",
+        end: "24:00",
+      }),
+    },
   },
   setup(props) {
-    const cellWidth = ref(50);
+    const cellWidth = ref(props.options.cellWidth);
     const clicksDown = ref(0);
     const clicksUp = ref(0);
-    const rowHeight = ref(60);
-    const scale = ref(0.5);
+    const rowHeight = ref(props.options.rowHeight);
+    const scale = ref(props.options.scale);
     const showVerticalLine = ref(false);
     const timeline = computed(() => generateTimeline(scale.value));
     const verticalLineX = ref(0);
