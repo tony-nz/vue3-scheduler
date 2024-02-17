@@ -341,14 +341,14 @@ export default defineComponent({
       if (event.deltaY < 0) {
         clicksUp.value++;
         if (clicksUp.value === 5) {
-          scale.value = Math.min(scale.value + 0.25, 5); // Limit the scale to 5
+          scale.value = Math.min(scale.value + 0.5, 5); // Limit the scale to 5
           clicksUp.value = 0;
         }
       }
       if (event.deltaY > 0) {
         clicksDown.value++;
         if (clicksDown.value === 5) {
-          scale.value = Math.max(scale.value - 0.25, 0.25); // Limit the scale to 0.25
+          scale.value = Math.max(scale.value - 0.5, 0.5); // Limit the scale to 0.25
           clicksDown.value = 0;
         }
       }
