@@ -176,25 +176,8 @@ export default defineComponent({
         cellWidth: 50,
         rowHeight: 60,
         scale: 0.5,
-        start: new Date()
-          .toLocaleString("en-NZ", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-          .replace(",", ""),
-        end: new Date()
-          .toLocaleString("en-NZ", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-          .replace(/\d+:\d+$/, "23:59")
-          .replace(",", ""),
+        start: new Date(),
+        end: new Date(),
       }),
     },
   },
