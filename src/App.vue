@@ -38,6 +38,11 @@ export default defineComponent({
     const end = new Date();
 
     /**
+     * Add one day to the end date
+     */
+    end.setDate(end.getDate() + 1);
+
+    /**
      * Timeline data
      */
     const timelineData = ref<TimelineItem[]>([

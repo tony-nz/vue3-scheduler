@@ -62,7 +62,7 @@
             <div id="head" class="flex">
               <div
                 v-for="time in timeline"
-                :key="time"
+                :key="time.id"
                 class="text-center items-center relative p-2.5 border-r bg-slate-500 text-xs text-gray-100"
                 :style="
                   'min-width: ' +
@@ -79,11 +79,13 @@
                   'px; '
                 "
               >
-                <span v-if="time === '24:00'">00:00 AM</span>
-                <span v-else
-                  >{{ time }}
-                  <span class="uppercase">{{ getTimeOfDay(time) }}</span></span
-                >
+                <span>
+                  {{ time.date }}
+                  {{ time.formattedTime }}
+                  <span class="uppercase">{{
+                    getTimeOfDay(time.formattedTime)
+                  }}</span>
+                </span>
               </div>
             </div>
             <div
@@ -213,14 +215,37 @@ export default defineComponent({
       const startDateTime = new Date(startTime);
       const endDateTime = new Date(endTime);
 
-      // Convert start and end times to minutes
-      const startMinutes =
-        startDateTime.getHours() * 60 + startDateTime.getMinutes();
-      const endMinutes = endDateTime.getHours() * 60 + endDateTime.getMinutes();
-
       const timeSlots = [];
-      for (let time = startMinutes; time <= endMinutes; time += scale * 60) {
-        timeSlots.push(formatTime(time));
+
+      // Iterate through days
+      for (
+        let currentDay = new Date(startDateTime);
+        currentDay <= endDateTime;
+        currentDay.setDate(currentDay.getDate() + 1)
+      ) {
+        // Convert start and end times to minutes
+        const startMinutes =
+          currentDay.getHours() * 60 + currentDay.getMinutes();
+        const endMinutes =
+          currentDay.getDate() === endDateTime.getDate()
+            ? endDateTime.getHours() * 60 + endDateTime.getMinutes()
+            : 24 * 60 - 1; // Set to end of the day for the last day
+
+        // Iterate through minutes of the current day
+        for (let time = startMinutes; time <= endMinutes; time += scale * 60) {
+          timeSlots.push({
+            id: timeSlots.length,
+            dateTime: new Date(
+              currentDay.getFullYear(),
+              currentDay.getMonth(),
+              currentDay.getDate(),
+              Math.floor(time / 60),
+              time % 60
+            ),
+            date: `${currentDay.getDate()}/${currentDay.getMonth() + 1}`,
+            formattedTime: formatTime(time),
+          });
+        }
       }
 
       return timeSlots;
