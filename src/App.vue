@@ -1,49 +1,52 @@
 <template>
-  <div class="container mx-auto">
+  <div class="mx-auto">
     <!-- github link -->
-    <div class="container mx-auto flex justify-end mt-4">
+    <div class="mx-2 flex justify-end mt-4">
       <a
         href="https://github.com/tony-nz/vue3-scheduler"
         target="_blank"
         class="text-xs text-gray-400"
       >
-        <span class="mr-2">Created by Tony Myers</span>
+        <span class="mr-2"
+          >Created by tony-nz
+          <span class="text-xs text-gray-300">(Tony Myers)</span></span
+        >
         <img src="/github.svg" alt="github" class="w-4 h-4 inline-block mr-2" />
       </a>
     </div>
-  </div>
-  <VueScheduler
-    :data="timelineData"
-    :headers="timelineHeaders"
-    :items="timelineItems"
-    :options="timelineOptions"
-  >
-    <template #event="{ event, properties }">
-      <div
-        :class="[
-          event.background,
-          event.text,
-          'p-2',
-          'rounded-lg',
-          'shadow-md',
-          'text-xs',
-          'text-left',
-          'text-xs',
-          'rounded-md',
-          'text-nowrap',
-          'overflow-auto',
-          'opacity-80',
-          'truncate',
-        ]"
-        :style="{ width: properties.width + 'px' }"
-      >
-        <div class="flex flex-col truncate">
-          <div class="font-bold">{{ event.meta?.title }}</div>
-          <div class="text-slate-200">{{ event.meta?.description }}</div>
+    <VueScheduler
+      :data="timelineData"
+      :headers="timelineHeaders"
+      :items="timelineItems"
+      :options="timelineOptions"
+    >
+      <template #event="{ event, properties }">
+        <div
+          :class="[
+            event.background,
+            event.text,
+            'p-2',
+            'rounded-lg',
+            'shadow-md',
+            'text-xs',
+            'text-left',
+            'text-xs',
+            'rounded-md',
+            'text-nowrap',
+            'overflow-auto',
+            'opacity-80',
+            'truncate',
+          ]"
+          :style="{ width: properties.width + 'px' }"
+        >
+          <div class="flex flex-col truncate">
+            <div class="font-bold">{{ event.meta?.title }}</div>
+            <div class="text-slate-200">{{ event.meta?.description }}</div>
+          </div>
         </div>
-      </div>
-    </template>
-  </VueScheduler>
+      </template>
+    </VueScheduler>
+  </div>
 </template>
 
 <script lang="ts">

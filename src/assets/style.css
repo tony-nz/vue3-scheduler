@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-100;
+  @apply bg-white;
   @apply items-center;
   @apply overflow-hidden;
 }

@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="container mx-auto flex h-screen items-center justify-center overscroll-none"
-  >
+  <div class="flex h-screen items-center justify-center overscroll-none">
     <div class="bg-white grid rounded-lg max-w-6xl p-6 overscroll-none">
       <div class="flex flex-row justify-between p-4">
         <h1 class="text-2xl font-bold">Scheduler</h1>
