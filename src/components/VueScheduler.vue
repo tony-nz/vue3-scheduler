@@ -109,9 +109,7 @@
               <div
                 v-for="(timeline, index) in data"
                 :key="index"
-                draggable="true"
                 class="z-10 align-center flex absolute text-center text-xs rounded-md text-nowrap"
-                :class="timeline.background + ' ' + timeline.text"
                 style="margin-top: 4px; height: 53px"
                 :style="{
                   width: `${eventProperties[index].width}px`,
@@ -119,10 +117,7 @@
                   top: `${eventProperties[index].top}px`,
                 }"
               >
-                <div class="p-1">
-                  <div>start: {{ timeline.start }}</div>
-                  <div>end: {{ timeline.end }}</div>
-                </div>
+                <slot name="event" :event="timeline" />
               </div>
               <div v-for="(_row, index) in items" :key="index" class="flex">
                 <div

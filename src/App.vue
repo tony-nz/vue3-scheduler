@@ -17,7 +17,22 @@
     :headers="timelineHeaders"
     :items="timelineItems"
     :options="timelineOptions"
-  />
+  >
+    <template #event="{ event }">
+      <div
+        :class="[
+          event.background,
+          event.text,
+          'rounded-lg p-2 shadow-md',
+          'text-xs',
+          'w-32',
+          'text-center',
+        ]"
+      >
+        {{ event.start }} - {{ event.end }}
+      </div>
+    </template>
+  </VueScheduler>
 </template>
 
 <script lang="ts">
@@ -67,6 +82,13 @@ export default defineComponent({
         text: "text-white",
         start: "17/02/2024 01:00",
         end: "17/02/2024 02:15",
+      },
+      {
+        row: 1,
+        background: "bg-purple-500",
+        text: "text-white",
+        start: "17/02/2024 02:00",
+        end: "17/02/2024 03:15",
       },
       {
         row: 3,
