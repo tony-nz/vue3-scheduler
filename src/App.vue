@@ -18,18 +18,29 @@
     :items="timelineItems"
     :options="timelineOptions"
   >
-    <template #event="{ event }">
+    <template #event="{ event, properties }">
       <div
         :class="[
           event.background,
           event.text,
-          'rounded-lg p-2 shadow-md',
+          'p-2',
+          'rounded-lg',
+          'shadow-md',
           'text-xs',
-          'w-32',
-          'text-center',
+          'text-left',
+          'text-xs',
+          'rounded-md',
+          'text-nowrap',
+          'overflow-auto',
+          'opacity-80',
+          'truncate',
         ]"
+        :style="{ width: properties.width + 'px' }"
       >
-        {{ event.start }} - {{ event.end }}
+        <div class="flex flex-col truncate">
+          <div class="font-bold">{{ event.meta?.title }}</div>
+          <div class="text-slate-200">{{ event.meta?.description }}</div>
+        </div>
       </div>
     </template>
   </VueScheduler>
@@ -75,6 +86,7 @@ export default defineComponent({
         text: "text-white",
         start: "17/02/2024 01:00",
         end: "17/02/2024 02:00",
+        meta: { title: "Event 1", description: "Event 1 description" },
       },
       {
         row: 1,
@@ -82,6 +94,7 @@ export default defineComponent({
         text: "text-white",
         start: "17/02/2024 01:00",
         end: "17/02/2024 02:15",
+        meta: { title: "Event 2", description: "Event 2 description" },
       },
       {
         row: 1,
@@ -89,6 +102,7 @@ export default defineComponent({
         text: "text-white",
         start: "17/02/2024 02:00",
         end: "17/02/2024 03:15",
+        meta: { title: "Event 3", description: "Event 3 description" },
       },
       {
         row: 3,
@@ -96,6 +110,7 @@ export default defineComponent({
         text: "text-white",
         start: "17/02/2024 02:24",
         end: "17/02/2024 03:27",
+        meta: { title: "Event 4", description: "Event 4 description" },
       },
       {
         row: 4,
@@ -103,6 +118,7 @@ export default defineComponent({
         text: "text-white",
         start: "18/02/2024 02:24",
         end: "18/02/2024 03:27",
+        meta: { title: "Event 5", description: "Event 5 description" },
       },
       {
         row: 5,
@@ -110,6 +126,7 @@ export default defineComponent({
         text: "text-white",
         start: "18/02/2024 02:24",
         end: "19/02/2024 03:27",
+        meta: { title: "Event 6", description: "Event 6 description" },
       },
     ]);
 
@@ -135,7 +152,10 @@ export default defineComponent({
      */
     const timelineOptions = ref<TimelineOptions>({
       cellWidth: 50,
-      rowHeight: 60,
+      row: {
+        height: 80,
+        marginTop: 4,
+      },
       scale: 0.5,
       start: "17/02/2024 00:00",
       end: "19/02/2024 23:59",

@@ -51,7 +51,17 @@
                   v-for="col in row"
                   :key="col"
                   class="grid w-full text-left relative mt-px p-2.5 mr-px bg-white text-xs text-gray-400 leading-10 text-medium"
-                  :class="'min-w-[' + cellWidth + 'px]'"
+                  :style="
+                    'min-width: ' +
+                    cellWidth +
+                    'px; ' +
+                    'min-height: ' +
+                    rowHeight +
+                    'px; ' +
+                    'max-height: ' +
+                    rowHeight +
+                    'px; '
+                  "
                 >
                   {{ col }}
                 </div>
@@ -109,15 +119,20 @@
               <div
                 v-for="(timeline, index) in data"
                 :key="index"
-                class="z-10 align-center flex absolute text-center text-xs rounded-md text-nowrap"
-                style="margin-top: 4px; height: 53px"
+                class="z-10 flex absolute"
                 :style="{
+                  'margin-top': `${rowMarginTop}px`,
+                  height: `${rowHeight - 8}px`,
                   width: `${eventProperties[index].width}px`,
                   left: `${eventProperties[index].left}px`,
                   top: `${eventProperties[index].top}px`,
                 }"
               >
-                <slot name="event" :event="timeline" />
+                <slot
+                  name="event"
+                  :event="timeline"
+                  :properties="eventProperties[index]"
+                />
               </div>
               <div v-for="(_row, index) in items" :key="index" class="flex">
                 <div
@@ -171,10 +186,12 @@ export default defineComponent({
       type: Object as PropType<TimelineOptions>,
       default: () => ({
         cellWidth: 50,
-        rowHeight: 60,
+        row: {
+          height: 60,
+        },
         scale: 0.5,
-        start: new Date(),
-        end: new Date(),
+        start: "01/01/2024 00:00",
+        end: "01/01/2024 23:00",
       }),
     },
   },
@@ -182,7 +199,8 @@ export default defineComponent({
     const cellWidth = ref(props.options.cellWidth);
     const clicksDown = ref(0);
     const clicksUp = ref(0);
-    const rowHeight = ref(props.options.rowHeight);
+    const rowHeight = ref(props.options.row.height);
+    const rowMarginTop = ref(props.options.row.marginTop);
     const scale = ref(props.options.scale);
     const showVerticalLine = ref(false);
     const timeline = computed(() =>
@@ -348,7 +366,7 @@ export default defineComponent({
       if (event.deltaY > 0) {
         clicksDown.value++;
         if (clicksDown.value === 5) {
-          scale.value = Math.max(scale.value - 0.5, 0.5); // Limit the scale to 0.25
+          scale.value = Math.max(scale.value - 0.5, 0.5); // Limit the scale to 0.5
           clicksDown.value = 0;
         }
       }
@@ -411,6 +429,7 @@ export default defineComponent({
       handleMouseLeave,
       onWheel,
       rowHeight,
+      rowMarginTop,
       scale,
       showVerticalLine,
       timeline,
