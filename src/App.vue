@@ -16,11 +16,13 @@
     :data="timelineData"
     :headers="timelineHeaders"
     :items="timelineItems"
+    :options="timelineOptions"
   />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { TimelineItem, TimelineOptions } from "./types/VueScheduler";
 import VueScheduler from "./components/VueScheduler.vue";
 
 export default defineComponent({
@@ -32,7 +34,7 @@ export default defineComponent({
     /**
      * Timeline data
      */
-    const timelineData = ref([
+    const timelineData = ref<TimelineItem[]>([
       {
         row: 0,
         background: "bg-emerald-500",
@@ -150,10 +152,22 @@ export default defineComponent({
       ["BMON-G", "08:00am"],
     ];
 
+    /**
+     * Timeline options
+     */
+    const timelineOptions = ref<TimelineOptions>({
+      cellWidth: 50,
+      rowHeight: 60,
+      scale: 0.5,
+      start: "00:00",
+      end: "23:59",
+    });
+
     return {
       timelineData,
       timelineHeaders,
       timelineItems,
+      timelineOptions,
     };
   },
 });

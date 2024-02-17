@@ -153,22 +153,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from "vue";
-
-interface TimelineItem {
-  background: string;
-  text: string;
-  start: string;
-  end: string;
-  row: number;
-}
-
-interface TimelineOptions {
-  cellWidth: number;
-  rowHeight: number;
-  scale: number;
-  start: string;
-  end: string;
-}
+import { TimelineItem, TimelineOptions } from "../types/VueScheduler";
 
 export default defineComponent({
   name: "VueScheduler",
