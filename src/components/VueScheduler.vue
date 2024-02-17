@@ -161,11 +161,6 @@ interface TimelineItem {
   end: string;
   row: number;
 }
-interface IItem {
-  start: string;
-  end: string;
-  row: number;
-}
 
 export default defineComponent({
   name: "VueScheduler",
