@@ -334,7 +334,8 @@ export default defineComponent({
       return propData.value.map((event) => {
         const { start, end, row } = event as TimelineItem;
         const optStartDate = new Date(parseDate(props.options.start));
-
+        let selectedRow = row;
+        selectedRow++;
         // Extract date and time parts
         const [startDate, startTime] = start.split(" ");
         const endTime = end.split(" ")[1];
@@ -358,7 +359,8 @@ export default defineComponent({
         let eventWidth =
           ((endInMinutes - startInMinutes) / (scale.value * 60)) *
           cellWidth.value;
-        const top = row * rowHeight.value + row * 1;
+        const top =
+          selectedRow * rowHeight.value + selectedRow * 1 - rowHeight.value;
         // Calculate left position based on date and time
         const startDateObject = new Date(
           `${startYear}-${startMonth}-${startDay}T${startTime}`
@@ -510,7 +512,6 @@ export default defineComponent({
                   const endDateObject = startDateObject.setMinutes(
                     startDateObject.getMinutes() + minutes
                   );
-                  console.log("startDateObject after", startDateObject);
 
                   // convert endDateObject back to DD/MM/YYYY HH:mm
                   const endTime = new Date(endDateObject);
@@ -555,8 +556,8 @@ export default defineComponent({
           .on("dragmove", function (event) {
             console.log(element.getAttribute("data-index"));
             // Update the dataset values for each element separately
-            element.dataset.x += event.dx;
-            element.dataset.y += event.dy;
+            element.dataset.x += parseInt(event.dx);
+            element.dataset.y += parseInt(event.dy);
             element.style.transform = `translate(${element.dataset.x}px, ${element.dataset.y}px)`;
           });
       });
