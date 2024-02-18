@@ -531,8 +531,7 @@ export default defineComponent({
                 min: { width: 100, height: rowHeight.value },
               }),
             ],
-
-            inertia: true,
+            // inertia: true,
           })
           .draggable({
             listeners: { move: window.dragMoveListener },
