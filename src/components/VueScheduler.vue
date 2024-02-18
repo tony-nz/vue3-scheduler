@@ -448,7 +448,7 @@ export default defineComponent({
     };
 
     const draggableElement: any = ref(null);
-    function dragMoveListener(event) {
+    function dragMoveListener(event: any) {
       const target = event.target;
       // keep the dragged position in the data-x/data-y attributes
       const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
