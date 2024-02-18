@@ -10,6 +10,7 @@
     "format": "prettier .  --write"
   },
   "dependencies": {
+    "interactjs": "^1.10.26",
     "vue": "^3.2.47"
   },
   "devDependencies": {

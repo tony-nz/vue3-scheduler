@@ -19,7 +19,7 @@
             id="main-items"
             class="w-[250px] border-r rounded-l-lg bg-gray-100 mr-px overflow-hidden overscroll-noner"
           >
-            <div id="row-header" class="flex">
+            <div id="row-header" class="flex border-b">
               <div
                 v-for="(row, index) in headers"
                 :key="index"
@@ -48,16 +48,16 @@
                 <div
                   v-for="col in row"
                   :key="col"
-                  class="grid w-full text-left relative mt-px p-2.5 mr-px bg-white text-xs text-gray-400 leading-10 text-medium"
+                  class="grid w-full text-left relative border-b p-2.5 mr-px bg-white text-xs text-gray-400 leading-10 text-medium"
                   :style="
                     'min-width: ' +
                     cellWidth +
                     'px; ' +
                     'min-height: ' +
-                    rowHeight +
+                    getRowHeight +
                     'px; ' +
                     'max-height: ' +
-                    rowHeight +
+                    getRowHeight +
                     'px; '
                   "
                 >
@@ -67,7 +67,7 @@
             </div>
           </div>
           <div class="flex flex-col overflow-auto rounded-r-lg">
-            <div id="head" class="flex">
+            <div id="head" class="flex border-b">
               <div
                 v-for="time in timeline"
                 :key="time.id"
@@ -106,7 +106,7 @@
                 v-if="showVerticalLine"
                 id="vertical-line"
                 :style="{ left: verticalLineX + 'px' }"
-                class="z-20 absolute top-0 bottom-0 border-r-2 border-emerald-600 opacity-60"
+                class="hidden z-20 absolute top-0 bottom-0 border-r-2 border-emerald-600 opacity-60"
               />
               <div
                 class="z-20 border-r-2 border-red-500 h-full align-center flex absolute"
@@ -117,10 +117,10 @@
               <div
                 v-for="(timeline, index) in data"
                 :key="index"
-                class="z-10 flex absolute"
+                :data-index="index"
+                class="z-10 draggable flex absolute"
                 :style="{
-                  'margin-top': `${rowMarginTop}px`,
-                  height: `${rowHeight - 8}px`,
+                  height: `${rowHeight}px`,
                   width: `${eventProperties[index].width}px`,
                   left: `${eventProperties[index].left}px`,
                   top: `${eventProperties[index].top}px`,
@@ -131,12 +131,34 @@
                   :event="timeline"
                   :properties="eventProperties[index]"
                 />
+                <!-- resize handle -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 192 512"
+                  class="absolute right-0 h-4 w-4 resize-handle"
+                  :style="{
+                    top: `${rowHeight / 3}px`,
+                  }"
+                >
+                  <path
+                    class="opacity-40 fill-white"
+                    d="M0 64C0 46.33 14.33 32 32 32C49.67 32 64 46.33 64 64V448C64 465.7 49.67 480 32 480C14.33 480 0 465.7 0 448V64z"
+                  />
+                  <path
+                    class="opacity-40 fill-white"
+                    d="M128 64C128 46.33 142.3 32 160 32C177.7 32 192 46.33 192 64V448C192 465.7 177.7 480 160 480C142.3 480 128 465.7 128 448V64z"
+                  />
+                </svg>
               </div>
-              <div v-for="(_row, index) in items" :key="index" class="flex">
+              <div
+                v-for="(_row, index) in items"
+                :key="index"
+                class="flex dropzone"
+              >
                 <div
                   v-for="(_time, timeIdx) in timeline"
                   :key="timeIdx"
-                  class="text-center relative mt-px p-2.5 border-r bg-white text-xs text-white leading-10 text-medium"
+                  class="text-center relative p-2.5 border-b border-r bg-white text-xs text-white leading-10 text-medium"
                   :style="
                     'min-width: ' +
                     cellWidth +
@@ -145,10 +167,10 @@
                     cellWidth +
                     'px; ' +
                     'min-height: ' +
-                    rowHeight +
+                    getRowHeight +
                     'px; ' +
                     'max-height: ' +
-                    rowHeight +
+                    getRowHeight +
                     'px; '
                   "
                 />
@@ -162,8 +184,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from "vue";
+import { computed, defineComponent, onMounted, PropType, ref } from "vue";
 import { TimelineItem, TimelineOptions } from "../types/VueScheduler";
+import interact from "interactjs";
+
+declare global {
+  interface Window {
+    dragMoveListener: (event: any) => void;
+  }
+}
 
 export default defineComponent({
   name: "VueScheduler",
@@ -197,6 +226,7 @@ export default defineComponent({
     const cellWidth = ref(props.options.cellWidth);
     const clicksDown = ref(0);
     const clicksUp = ref(0);
+    const propData = ref(props.data);
     const rowHeight = ref(props.options.row.height);
     const rowMarginTop = ref(props.options.row.marginTop);
     const scale = ref(props.options.scale);
@@ -257,7 +287,7 @@ export default defineComponent({
         const endMinutes =
           currentDay.getDate() === endDateTime.getDate()
             ? endDateTime.getHours() * 60 + endDateTime.getMinutes()
-            : 24 * 60 - 1; // Set to end of the day for the last day
+            : 24 * 60; // Set to end of the day for the last day
 
         // Iterate through minutes of the current day
         for (let time = startMinutes; time <= endMinutes; time += scale * 60) {
@@ -301,7 +331,7 @@ export default defineComponent({
      * @returns {Array} Array of objects with top, left and width properties
      */
     const eventProperties = computed(() => {
-      return props.data.map((event) => {
+      return propData.value.map((event) => {
         const { start, end, row } = event as TimelineItem;
         const optStartDate = new Date(parseDate(props.options.start));
 
@@ -328,7 +358,7 @@ export default defineComponent({
         let eventWidth =
           ((endInMinutes - startInMinutes) / (scale.value * 60)) *
           cellWidth.value;
-        const top = row * rowHeight.value + (row + 1) * 1;
+        const top = row * rowHeight.value + row * 1;
         // Calculate left position based on date and time
         const startDateObject = new Date(
           `${startYear}-${startMonth}-${startDay}T${startTime}`
@@ -356,14 +386,14 @@ export default defineComponent({
     const onWheel = (event: WheelEvent) => {
       if (event.deltaY < 0) {
         clicksUp.value++;
-        if (clicksUp.value === 5) {
+        if (clicksUp.value === 3) {
           scale.value = Math.min(scale.value + 0.5, 5); // Limit the scale to 5
           clicksUp.value = 0;
         }
       }
       if (event.deltaY > 0) {
         clicksDown.value++;
-        if (clicksDown.value === 5) {
+        if (clicksDown.value === 3) {
           scale.value = Math.max(scale.value - 0.5, 0.5); // Limit the scale to 0.5
           clicksDown.value = 0;
         }
@@ -417,10 +447,139 @@ export default defineComponent({
       }
     };
 
+    const draggableElement: any = ref(null);
+    function dragMoveListener(event) {
+      const target = event.target;
+      // keep the dragged position in the data-x/data-y attributes
+      const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+      const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+
+      // translate the element
+      target.style.transform = "translate(" + x + "px, " + y + "px)";
+
+      // update the posiion attributes
+      target.setAttribute("data-x", x);
+      target.setAttribute("data-y", y);
+    }
+
+    /**
+     * Initialize the draggable and resizable elements
+     */
+    const initDraggable = () => {
+      const elements: any = document.querySelectorAll(".draggable");
+      // enable draggables to be dropped into this
+      window.dragMoveListener = dragMoveListener;
+
+      elements.forEach((element: any) => {
+        // Use dataset to store element-specific data
+        element.dataset.x = 0;
+        element.dataset.y = 0;
+
+        interact(element)
+          .resizable({
+            // resize from all edges and corners
+            edges: { left: false, right: true, bottom: false, top: false },
+            listeners: {
+              move(event) {
+                const dataIndex = element.getAttribute("data-index");
+                const selectedEvent = propData.value[dataIndex];
+                const width = event.rect.width;
+                const height = event.rect.height;
+                const minutes = Math.round(
+                  (width / cellWidth.value) * scale.value * 60
+                ); // convert width to time based on the scale
+
+                // update the element's style
+                element.style.width = width + "px";
+                element.style.height = height + "px";
+
+                // translate when resizing from top or left edges
+                element.dataset.x += event.deltaRect.left;
+
+                element.style.transform = `translate(${element.dataset.x}px, ${element.dataset.y}px)`;
+
+                // remove decimal from timeLength
+                const match = selectedEvent.start.match(
+                  /(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/
+                );
+                if (match) {
+                  const [, startDay, startMonth, startYear, startTime] = match;
+                  const startDateObject = new Date(
+                    `${startYear}-${startMonth}-${startDay}T${startTime}`
+                  );
+                  const endDateObject = startDateObject.setMinutes(
+                    startDateObject.getMinutes() + minutes
+                  );
+                  console.log("startDateObject after", startDateObject);
+
+                  // convert endDateObject back to DD/MM/YYYY HH:mm
+                  const endTime = new Date(endDateObject);
+
+                  propData.value[dataIndex].end = `${endTime.getDate()}/${
+                    endTime.getMonth() + 1
+                  }/${endTime.getFullYear()} ${endTime.getHours()}:${endTime.getMinutes()}`;
+                }
+              },
+            },
+            modifiers: [
+              // keep the edges inside the parent
+              interact.modifiers.restrictEdges({
+                outer: "parent",
+              }),
+              // minimum size
+              interact.modifiers.restrictSize({
+                min: { width: 100, height: rowHeight.value },
+              }),
+            ],
+
+            inertia: true,
+          })
+          .draggable({
+            listeners: { move: window.dragMoveListener },
+            modifiers: [
+              interact.modifiers.snap({
+                targets: [
+                  interact.snappers.grid({ x: 10, y: rowHeight.value + 1 }),
+                ],
+                range: Infinity,
+                relativePoints: [{ x: 0, y: 0 }],
+                offset: "#body",
+              }),
+              interact.modifiers.restrict({
+                restriction: "parent",
+                elementRect: { top: 0, left: 0, bottom: 1, right: 0 },
+                endOnly: false,
+              }),
+            ],
+            inertia: true,
+          })
+          .on("dragmove", function (event) {
+            console.log(element.getAttribute("data-index"));
+            // Update the dataset values for each element separately
+            element.dataset.x += event.dx;
+            element.dataset.y += event.dy;
+            element.style.transform = `translate(${element.dataset.x}px, ${element.dataset.y}px)`;
+          });
+      });
+    };
+
+    /**
+     * Row height border fix
+     */
+    const getRowHeight = computed(() => {
+      return rowHeight.value + 1;
+    });
+
+    onMounted(() => {
+      initDraggable();
+    });
+
     return {
       cellWidth,
+      draggableElement,
       eventProperties,
       getCurrentTimePosition,
+      getRowHeight,
       getScaleTime,
       getTimeOfDay,
       handleMouseMove,

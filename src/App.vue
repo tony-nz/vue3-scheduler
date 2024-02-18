@@ -20,12 +20,13 @@
       :items="timelineItems"
       :options="timelineOptions"
     >
-      <template #event="{ event, properties }">
+      <template #event="{ event }">
         <div
           :class="[
             event.background,
             event.text,
             'p-2',
+            'w-full',
             'rounded-lg',
             'shadow-md',
             'text-xs',
@@ -37,7 +38,6 @@
             'opacity-80',
             'truncate',
           ]"
-          :style="{ width: properties.width + 'px' }"
         >
           <div class="flex flex-col truncate">
             <div class="font-bold">{{ event.meta?.title }}</div>
@@ -157,7 +157,7 @@ export default defineComponent({
     const timelineOptions = ref<TimelineOptions>({
       cellWidth: 50,
       row: {
-        height: 80,
+        height: 81,
         marginTop: 4,
       },
       scale: 0.5,
