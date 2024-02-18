@@ -106,7 +106,7 @@
                 v-if="showVerticalLine"
                 id="vertical-line"
                 :style="{ left: verticalLineX + 'px' }"
-                class="hidden z-20 absolute top-0 bottom-0 border-r-2 border-emerald-600 opacity-60"
+                class="z-10 absolute top-0 bottom-0 border-r-2 border-emerald-400 opacity-60"
               />
               <div
                 class="z-20 border-r-2 border-red-500 h-full align-center flex absolute"
