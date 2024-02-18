@@ -556,8 +556,13 @@ export default defineComponent({
           .on("dragmove", function (event) {
             console.log(element.getAttribute("data-index"));
             // Update the dataset values for each element separately
-            element.dataset.x += parseInt(event.dx);
-            element.dataset.y += parseInt(event.dy);
+            console.log("event", event);
+            console.log("element.dataset.x", element.dataset.x);
+            console.log("element.dataset.y", element.dataset.y);
+            console.log("event.dx", event.dx);
+            console.log("event.dy", event.dy);
+            element.dataset.x += event.dx;
+            element.dataset.y += event.dy;
             element.style.transform = `translate(${element.dataset.x}px, ${element.dataset.y}px)`;
           });
       });
