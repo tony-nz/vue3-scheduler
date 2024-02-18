@@ -190,7 +190,7 @@ import interact from "interactjs";
 
 declare global {
   interface Window {
-    dragMoveListener: (event: any) => void;
+    dragMoveListener: (event: DragEvent) => void;
   }
 }
 
@@ -449,123 +449,111 @@ export default defineComponent({
       }
     };
 
-    const draggableElement: any = ref(null);
-    function dragMoveListener(event: any) {
-      const target = event.target;
+    /**
+     * Drag move listener
+     * @param event
+     * @returns {void}
+     */
+    function dragMoveListener(event: MouseEvent) {
+      const target = event.target as HTMLElement; // Cast event.target to HTMLElement
+
       // keep the dragged position in the data-x/data-y attributes
-      const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-      const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+      const x = parseFloat(target.getAttribute("data-x") ?? "0") || 0;
+      const y = parseFloat(target.getAttribute("data-y") ?? "0") || 0;
 
       // translate the element
       target.style.transform = "translate(" + x + "px, " + y + "px)";
 
       // update the posiion attributes
-      target.setAttribute("data-x", x);
-      target.setAttribute("data-y", y);
+      target.setAttribute("data-x", x.toString());
+      target.setAttribute("data-y", y.toString());
     }
 
     /**
      * Initialize the draggable and resizable elements
+     * @param element
+     * @returns {void}
      */
-    const initDraggable = () => {
-      const elements: any = document.querySelectorAll(".draggable");
-      // enable draggables to be dropped into this
+    const initDraggable = (element: HTMLDivElement) => {
       window.dragMoveListener = dragMoveListener;
 
-      elements.forEach((element: any) => {
-        // Use dataset to store element-specific data
-        element.dataset.x = 0;
-        element.dataset.y = 0;
+      let x = 0;
+      let y = 0;
 
-        interact(element)
-          .resizable({
-            // resize from all edges and corners
-            edges: { left: false, right: true, bottom: false, top: false },
-            listeners: {
-              move(event) {
-                const dataIndex = element.getAttribute("data-index");
-                const selectedEvent = propData.value[dataIndex];
-                const width = event.rect.width;
-                const height = event.rect.height;
-                const minutes = Math.round(
-                  (width / cellWidth.value) * scale.value * 60
-                ); // convert width to time based on the scale
+      interact(element)
+        .resizable({
+          // resize from all edges and corners
+          edges: { left: false, right: true, bottom: false, top: false },
+          listeners: {
+            move(event) {
+              const dataIndex: number = parseInt(
+                element.getAttribute("data-index") ?? "0"
+              );
+              const selectedEvent = propData.value[dataIndex];
+              const width = event.rect.width;
+              const minutes = Math.round(
+                (width / cellWidth.value) * scale.value * 60
+              ); // convert width to time based on the scale
 
-                // update the element's style
-                element.style.width = width + "px";
-                element.style.height = height + "px";
-
-                // translate when resizing from top or left edges
-                element.dataset.x += event.deltaRect.left;
-
-                element.style.transform = `translate(${element.dataset.x}px, ${element.dataset.y}px)`;
-
-                // remove decimal from timeLength
-                const match = selectedEvent.start.match(
-                  /(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/
+              // remove decimal from timeLength
+              const match = selectedEvent.start.match(
+                /(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/
+              );
+              if (match) {
+                const [, startDay, startMonth, startYear, startTime] = match;
+                const startDateObject = new Date(
+                  `${startYear}-${startMonth}-${startDay}T${startTime}`
                 );
-                if (match) {
-                  const [, startDay, startMonth, startYear, startTime] = match;
-                  const startDateObject = new Date(
-                    `${startYear}-${startMonth}-${startDay}T${startTime}`
-                  );
-                  const endDateObject = startDateObject.setMinutes(
-                    startDateObject.getMinutes() + minutes
-                  );
+                const endDateObject = startDateObject.setMinutes(
+                  startDateObject.getMinutes() + minutes
+                );
 
-                  // convert endDateObject back to DD/MM/YYYY HH:mm
-                  const endTime = new Date(endDateObject);
+                // convert endDateObject back to DD/MM/YYYY HH:mm
+                const endTime = new Date(endDateObject);
 
-                  propData.value[dataIndex].end = `${endTime.getDate()}/${
-                    endTime.getMonth() + 1
-                  }/${endTime.getFullYear()} ${endTime.getHours()}:${endTime.getMinutes()}`;
-                }
-              },
+                propData.value[dataIndex].end = `${endTime.getDate()}/${
+                  endTime.getMonth() + 1
+                }/${endTime.getFullYear()} ${endTime.getHours()}:${endTime.getMinutes()}`;
+              }
             },
-            modifiers: [
-              // keep the edges inside the parent
-              interact.modifiers.restrictEdges({
-                outer: "parent",
-              }),
-              // minimum size
-              interact.modifiers.restrictSize({
-                min: { width: 100, height: rowHeight.value },
-              }),
-            ],
-            // inertia: true,
-          })
-          .draggable({
-            listeners: { move: window.dragMoveListener },
-            modifiers: [
-              interact.modifiers.snap({
-                targets: [
-                  interact.snappers.grid({ x: 10, y: rowHeight.value + 1 }),
-                ],
-                range: Infinity,
-                relativePoints: [{ x: 0, y: 0 }],
-                offset: "#body",
-              }),
-              interact.modifiers.restrict({
-                restriction: "parent",
-                elementRect: { top: 0, left: 0, bottom: 1, right: 0 },
-                endOnly: false,
-              }),
-            ],
-            inertia: true,
-          })
-          .on("dragmove", function (event) {
-            console.log(element.getAttribute("data-index"));
-            // Update the dataset values for each element separately
-            console.log("event", event);
-            console.log("element.dataset.x", element.dataset.x);
-            console.log("element.dataset.y", element.dataset.y);
-            console.log("event.dx", event.dx);
-            console.log("event.dy", event.dy);
-            element.dataset.x += event.dx;
-            element.dataset.y += event.dy;
-            element.style.transform = `translate(${element.dataset.x}px, ${element.dataset.y}px)`;
-          });
-      });
+          },
+          modifiers: [
+            // keep the edges inside the parent
+            interact.modifiers.restrictEdges({
+              outer: "parent",
+            }),
+            // minimum size
+            interact.modifiers.restrictSize({
+              min: { width: 100, height: rowHeight.value },
+            }),
+          ],
+          inertia: false,
+        })
+        .draggable({
+          listeners: { move: window.dragMoveListener },
+          modifiers: [
+            interact.modifiers.snap({
+              targets: [
+                interact.snappers.grid({ x: 10, y: rowHeight.value + 1 }),
+              ],
+              range: Infinity,
+              relativePoints: [{ x: 0, y: 0 }],
+              offset: "#body",
+            }),
+            interact.modifiers.restrict({
+              restriction: "parent",
+              elementRect: { top: 0, left: 0, bottom: 1, right: 0 },
+              endOnly: false,
+            }),
+          ],
+          inertia: true,
+        })
+        .on("dragmove", function (event) {
+          x += event.dx;
+          y += event.dy;
+
+          event.target.style.transform = "translate(" + x + "px, " + y + "px)";
+        });
     };
 
     /**
@@ -576,12 +564,13 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      initDraggable();
+      document.querySelectorAll(".draggable").forEach((element: Element) => {
+        initDraggable(element as HTMLDivElement);
+      });
     });
 
     return {
       cellWidth,
-      draggableElement,
       eventProperties,
       getCurrentTimePosition,
       getRowHeight,
