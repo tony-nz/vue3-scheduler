@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto">
+  <div class="mx-auto hidden">
     <!-- github link -->
     <div class="mx-2 flex justify-end mt-4">
       <a
@@ -47,17 +47,58 @@
       </template>
     </VueScheduler>
   </div>
+  <!-- toolbar for scale -->
+  <div class="flex justify-center items-center my-4 space-x-4">
+    <h1 class="text-gray-700 text-lg font-bold"></h1>
+    <div>
+      <button
+        class="bg-gray-300 text-gray-700 p-1 rounded-md mr-1"
+        @click="newOptions.scale -= 0.5"
+      >
+        -
+      </button>
+      <button
+        class="bg-gray-300 text-gray-700 p-1 rounded-md"
+        @click="newOptions.scale += 0.5"
+      >
+        +
+      </button>
+    </div>
+  </div>
+  <div>
+    <VueSchedulerV2
+      :end="newEnd"
+      :events="newData"
+      :headers="timelineHeaders"
+      :identifiers="timelineItems"
+      :options="newOptions"
+      :start="newStart"
+    />
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { TimelineItem, TimelineOptions } from "./types/VueScheduler";
 import VueScheduler from "./components/VueScheduler.vue";
+import VueSchedulerV2 from "./components/VueSchedulerV2.vue";
+
+interface Event {
+  identiferIdx: number;
+  start: Date;
+  end: Date;
+  meta?: {
+    description?: string;
+    text?: string;
+    title?: string;
+  };
+}
 
 export default defineComponent({
   name: "App",
   components: {
     VueScheduler,
+    VueSchedulerV2,
   },
   setup() {
     /**
@@ -165,11 +206,44 @@ export default defineComponent({
       end: "19/02/2024 23:59",
     });
 
+    /**
+     * Refactored data
+     */
+
+    const newEnd = new Date(2024, 1, 1, 23, 0);
+    const newStart = new Date(2024, 1, 1, 0, 0);
+
+    const newOptions = ref({
+      cellWidth: 50,
+      rowHeight: 81,
+      scaleUnit: "hours",
+      timeFormat: "HH:mm",
+    });
+
+    const newData = ref<Event[]>([
+      {
+        identiferIdx: 0,
+        start: new Date(2024, 1, 1, 1, 15),
+        end: new Date(2024, 1, 1, 2, 0),
+        meta: { title: "Event 1", description: "Event 1 description" },
+      },
+      {
+        identiferIdx: 1,
+        start: new Date(2024, 1, 1, 3, 0),
+        end: new Date(2024, 1, 1, 5, 0),
+        meta: { title: "Event 2", description: "Event 2 description" },
+      },
+    ]);
+
     return {
       timelineData,
       timelineHeaders,
       timelineItems,
       timelineOptions,
+      newStart,
+      newEnd,
+      newOptions,
+      newData,
     };
   },
 });
