@@ -1,5 +1,4 @@
 <template>
-  {{ scale }}
   <div
     id="vue3-scheduler"
     class="grid h-full rounded-lg overflow-hidden overscroll-none bg-gray-100 p-3"
@@ -87,6 +86,7 @@
           "
         >
           <span>
+            {{ time.formattedDate }}
             {{ time.formattedTime }}
           </span>
         </div>
@@ -104,7 +104,8 @@
           v-for="(event, index) in events"
           :key="index"
           :data-index="index"
-          class="z-10 draggable flex absolute bg-gray-200"
+          class="z-10 draggable flex absolute"
+          :class="event.meta?.class || 'bg-blue-500'"
           :style="{
             height: `${rowHeight}px`,
             width: `${getEventWidth(event.start, event.end)}px`,
@@ -171,22 +172,26 @@ interface Event {
   start: Date;
   end: Date;
   meta?: {
+    class?: string;
     description?: string;
     title?: string;
   };
 }
 
 interface Options {
-  cellWidth: number;
-  rowHeight: number;
-  scaleUnit: string;
-  timeFormat: string;
+  cellWidth?: number;
+  rowHeight?: number;
+  scaleUnit?: string;
+  scaleCustom?: number;
+  scrollSpeed?: number;
+  timeFormat?: string;
 }
 
 const DEFAULT_OPTIONS: Options = {
   cellWidth: 100,
   rowHeight: 50,
   scaleUnit: "minutes",
+  scrollSpeed: 5,
   timeFormat: "HH:mm",
 };
 
@@ -225,6 +230,7 @@ export default defineComponent({
       props.options?.rowHeight || DEFAULT_OPTIONS.rowHeight
     );
     const scale = ref(0.5);
+    const scaleIngrement = ref(0.5);
     const scrollDown = ref(0);
     const scrollUp = ref(0);
 
@@ -249,7 +255,13 @@ export default defineComponent({
         timeSlots.push({
           id: i.getTime(),
           date: i,
-          formattedTime: i.toLocaleTimeString(),
+          // formattedTime: i.toLocaleTimeString(),
+          // hh:mm am/pm
+          formattedDate: `${i.getDate()}/${i.getMonth() + 1}`,
+          formattedTime: i.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+          }),
         });
       }
 
@@ -305,36 +317,46 @@ export default defineComponent({
     const onWheel = (event: WheelEvent) => {
       if (event.deltaY < 0) {
         scrollUp.value++;
-        if (scrollUp.value === 3) {
-          scale.value = Math.min(scale.value + scale.value, 5); // Limit the scale to 5
+        if (scrollUp.value === props.options?.scrollSpeed) {
+          scale.value = Math.min(scale.value + scaleIngrement.value, 5); // Limit the scale to 5
           scrollUp.value = 0;
         }
       }
       if (event.deltaY > 0) {
         scrollDown.value++;
-        if (scrollDown.value === 3) {
-          scale.value = Math.max(scale.value - scale.value, 0.5); // Limit the scale to 0.5
+        if (scrollDown.value === props.options?.scrollSpeed) {
+          scale.value = Math.max(scale.value - scaleIngrement.value, 0.5); // Limit the scale to 0.5
           scrollDown.value = 0;
         }
       }
     };
 
     const setScale = () => {
+      // check if custom scale is set
+      if (props.options?.scaleCustom) {
+        scale.value = props.options.scaleCustom;
+        return;
+      }
+
       switch (props.options?.scaleUnit) {
         case "minutes":
           // if minute scroll by 0.5
           scale.value = 0.5;
+          scaleIngrement.value = 0.5;
           break;
         case "hours":
           // if hour scroll by 1.0
           scale.value = 1.0;
+          scaleIngrement.value = 1.0;
           break;
         case "days":
           // if day scroll by 24.0
           scale.value = 24.0;
+          scaleIngrement.value = 24.0;
           break;
         default:
           scale.value = 0.5;
+          scaleIngrement.value = 0.5;
       }
     };
 
@@ -424,11 +446,11 @@ export default defineComponent({
           modifiers: [
             interact.modifiers.snap({
               targets: [
-                interact.snappers.grid({ x: 10, y: rowHeight.value + 1 }),
+                interact.snappers.grid({ x: 10, y: rowHeight.value || 50 }),
               ],
               range: Infinity,
               relativePoints: [{ x: 0, y: 0 }],
-              offset: "#body",
+              offset: "#events",
             }),
             interact.modifiers.restrict({
               restriction: "parent",

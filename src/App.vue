@@ -47,24 +47,6 @@
       </template>
     </VueScheduler>
   </div>
-  <!-- toolbar for scale -->
-  <div class="flex justify-center items-center my-4 space-x-4">
-    <h1 class="text-gray-700 text-lg font-bold"></h1>
-    <div>
-      <button
-        class="bg-gray-300 text-gray-700 p-1 rounded-md mr-1"
-        @click="newOptions.scale -= 0.5"
-      >
-        -
-      </button>
-      <button
-        class="bg-gray-300 text-gray-700 p-1 rounded-md"
-        @click="newOptions.scale += 0.5"
-      >
-        +
-      </button>
-    </div>
-  </div>
   <div>
     <VueSchedulerV2
       :end="newEnd"
@@ -73,7 +55,16 @@
       :identifiers="timelineItems"
       :options="newOptions"
       :start="newStart"
-    />
+    >
+      <template #event="{ event }">
+        <div class="flex flex-col truncate p-2 text-xs text-white">
+          <div class="font-bold">{{ event.meta?.title }}</div>
+          <div class="text-slate-200">{{ event.meta?.description }}</div>
+          <div class="text-slate-300">{{ event.start }} - {{ event.end }}</div>
+          <div class="text-slate-300">{{ event.end }}</div>
+        </div>
+      </template>
+    </VueSchedulerV2>
   </div>
 </template>
 
@@ -88,6 +79,7 @@ interface Event {
   start: Date;
   end: Date;
   meta?: {
+    class?: string;
     description?: string;
     text?: string;
     title?: string;
@@ -210,13 +202,15 @@ export default defineComponent({
      * Refactored data
      */
 
-    const newEnd = new Date(2024, 1, 1, 23, 0);
     const newStart = new Date(2024, 1, 1, 0, 0);
+    const newEnd = new Date(2024, 1, 2, 23, 0);
 
     const newOptions = ref({
       cellWidth: 50,
       rowHeight: 81,
-      scaleUnit: "hours",
+      scaleUnit: "minutes",
+      scaleCustom: 0.25,
+      scrollSpeed: 5,
       timeFormat: "HH:mm",
     });
 
@@ -225,13 +219,21 @@ export default defineComponent({
         identiferIdx: 0,
         start: new Date(2024, 1, 1, 1, 15),
         end: new Date(2024, 1, 1, 2, 0),
-        meta: { title: "Event 1", description: "Event 1 description" },
+        meta: {
+          title: "Event 1",
+          description: "Event 1 description",
+          class: "bg-emerald-500 opacity-80 rounded-md",
+        },
       },
       {
         identiferIdx: 1,
         start: new Date(2024, 1, 1, 3, 0),
         end: new Date(2024, 1, 1, 5, 0),
-        meta: { title: "Event 2", description: "Event 2 description" },
+        meta: {
+          title: "Event 2",
+          description: "Event 2 description",
+          class: "bg-orange-500 opacity-80 rounded-md",
+        },
       },
     ]);
 
