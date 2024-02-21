@@ -104,7 +104,8 @@
           v-for="(event, index) in events"
           :key="index"
           :data-index="index"
-          class="z-10 draggable flex absolute"
+          :data-x="getEventLeft(event.start)"
+          :data-y="getEventRow(event.identiferIdx)"
           :class="event.meta?.class || 'bg-blue-500'"
           :style="{
             height: `${rowHeight}px`,
@@ -112,6 +113,7 @@
             left: `${getEventLeft(event.start)}px`,
             top: `${getEventRow(event.identiferIdx)}px`,
           }"
+          class="z-10 draggable flex absolute"
         >
           <slot name="event" :event="event" />
           <!-- resize handle -->
@@ -366,18 +368,22 @@ export default defineComponent({
      * @returns {void}
      */
     function dragMoveListener(event: MouseEvent) {
+      // console.log(event.target.attributes[0]);
       const target = event.target as HTMLElement; // Cast event.target to HTMLElement
 
+      // extract x and y from css (event.target.style.transform)
       // keep the dragged position in the data-x/data-y attributes
       const x = parseFloat(target.getAttribute("data-x") ?? "0") || 0;
       const y = parseFloat(target.getAttribute("data-y") ?? "0") || 0;
 
       // translate the element
-      target.style.transform = "translate(" + x + "px, " + y + "px)";
+      // target.style.transform = "translate(" + x + "px, " + y + "px)";
+      // target.style.left = x + "px";
+      // target.style.top = y + "px";
 
       // update the posiion attributes
-      target.setAttribute("data-x", x.toString());
-      target.setAttribute("data-y", y.toString());
+      // target.setAttribute("data-x", x.toString());
+      // target.setAttribute("data-y", y.toString());
     }
 
     /**
@@ -463,8 +469,12 @@ export default defineComponent({
         .on("dragmove", function (event) {
           x += event.dx;
           y += event.dy;
-
-          event.target.style.transform = "translate(" + x + "px, " + y + "px)";
+          event.target.setAttribute("data-x", x.toString());
+          event.target.setAttribute("data-y", y.toString());
+          // event.target.style.transform = "translate(" + x + "px, " + y + "px)";
+          // event.target.style.left = x + "px";
+          // event.target.style.top = y + "px";
+          // updateEvent(event.target as HTMLDivElement, x, y);
         });
     };
 
