@@ -33,7 +33,7 @@
 
 ![Screen Shot](images/screenshot.png)
 
-Vue3 Scheduler simplifies time management in your Vue.js projects. No elaborate features or unnecessary complexity – just a straightforward tool for handling events and timelines. Developers, embrace efficiency without the cringe, and keep your projects on track with Vue Timeline Scheduler.
+Vue3 Scheduler simplifies time management in your Vue.js projects. No elaborate features or unnecessary complexity – just a straightforward tool for handling events and timelines.
 
 #### Features
 
