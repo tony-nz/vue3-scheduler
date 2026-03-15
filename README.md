@@ -1,184 +1,232 @@
-<br/>
-<p align="center">
-  <a href="https://github.com/tony-nz/vue3-scheduler">
-    <img src="images/logo.svg" alt="Logo" width="150" height="150">
-  </a>
+# Vue3 Gantt Chart
 
-  <h3 align="center">Vue3 Scheduler</h3>
+Interactive Gantt chart component built with Vue 3, TypeScript, and Tailwind CSS.
 
-  <p align="center">
-    Essential Timelines Made Easy: Vue Timeline Scheduler for Your Basic Needs.
-    <br/>
-    <br/>
-    <a href="https://github.com/tony-nz/vue3-scheduler"><strong>Explore the docs »</strong></a>
-    <br/>
-    <br/>
-    <a href="https://vue3-scheduler.netlify.app/" _target="blank">View Demo</a>
-    .
-    <a href="https://github.com/tony-nz/vue3-scheduler/issues">Report Bug</a>
-    .
-    <a href="https://github.com/tony-nz/vue3-scheduler/issues">Request Feature</a>
-  </p>
-</p>
+**[View Demo](https://vue3-scheduler.netlify.app/)**
 
-## Table Of Contents
+## Features
 
-- [About the Project](#about-the-project)
-  - [Features](#features)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [License](#license)
-
-## About The Project
-
-![Screen Shot](images/screenshot.png)
-
-Vue3 Scheduler simplifies time management in your Vue.js projects. No elaborate features or unnecessary complexity – just a straightforward tool for handling events and timelines.
-
-#### Features
-
-- Display events on a timeline with adjustable scales.
-- Customizable styling for events and the timeline.
-- Responsive design for various screen sizes.
-- Easily integrate with Vue.js applications.
+- Drag-and-drop event repositioning
+- Resize events from left and right edges
+- Dependency arrows between linked events (SVG overlay)
+- Progress bars on event bars
+- Milestone markers (diamond shape)
+- Collapsible row groups with deep nesting
+- Multi-level timeline headers (days/weeks/months)
+- Mouse wheel zoom to adjust time scale
+- Current time indicator and hover line
+- Keyboard navigation (arrow keys, delete, escape)
+- Event selection with visual highlight
+- Click empty cells to create events
+- Scroll-to-today button
+- CSS variable theming (6 built-in themes)
+- Synchronized sidebar/grid scrolling
 
 ## Getting Started
 
-This is an example of how to list things you need to use the software and how to install them.
-
 ```sh
-npm install npm@latest -g
-```
-
-```sh
+npm install
 npm run dev
 ```
 
-###
-
 ## Usage
 
-```js
-<VueScheduler
-  :data="timelineData"
-  :headers="timelineHeaders"
-  :items="timelineItems"
-  :options="timelineOptions"
->
-  <template #event="{ event, properties }">
-    <div
-      :class="[
-          event.background,
-          event.text,
-          'p-2',
-          'rounded-lg',
-          'shadow-md',
-          'text-xs',
-          'text-left',
-          'text-xs',
-          'rounded-md',
-          'text-nowrap',
-          'overflow-auto',
-          'opacity-80',
-          'truncate',
-        ]"
-      :style="{ width: properties.width + 'px' }"
-    >
-      <div class="flex flex-col truncate">
+```vue
+<template>
+  <GanttChart
+    :start="startDate"
+    :end="endDate"
+    :events="events"
+    :rows="rows"
+    :headers="['Task', 'Owner']"
+    :options="options"
+    @event-click="onEventClick"
+    @event-drag-end="onDragEnd"
+    @event-resize-end="onResizeEnd"
+    @cell-click="onCellClick"
+    @group-toggle="onGroupToggle"
+    @event-delete="onEventDelete"
+  >
+    <template #event="{ event }">
+      <div class="px-2 py-1 text-xs text-white truncate">
         <div class="font-bold">{{ event.meta?.title }}</div>
-        <div class="text-slate-200">{{ event.meta?.description }}</div>
       </div>
-    </div>
-  </template>
-</VueScheduler>
+    </template>
+  </GanttChart>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive } from "vue";
+import type { GanttEvent, GanttGroup, GanttOptions } from "./types/gantt";
+import GanttChart from "./components/GanttChart.vue";
+
+const startDate = new Date(2024, 2, 1);
+const endDate = new Date(2024, 3, 1);
+
+const options: GanttOptions = {
+  cellWidth: 80,
+  rowHeight: 45,
+  scale: 24,            // hours per cell
+  scaleUnit: "days",
+  scrollSpeed: 3,
+  showCurrentTime: true,
+  showHoverLine: true,
+  timelineLevels: [{ unit: "weeks" }],
+};
+
+const rows = reactive<GanttGroup[]>([
+  {
+    id: "phase-1",
+    label: "Phase 1",
+    children: [
+      { id: "task-1", columns: ["Design", "Alice"] },
+      { id: "task-2", columns: ["Development", "Bob"] },
+    ],
+  },
+]);
+
+const events = ref<GanttEvent[]>([
+  {
+    id: "evt-1",
+    rowId: "task-1",
+    start: new Date(2024, 2, 1, 8, 0),
+    end: new Date(2024, 2, 5, 17, 0),
+    progress: 75,
+    meta: {
+      title: "Design",
+      description: "UI/UX design",
+      class: "bg-blue-500 rounded",
+    },
+  },
+  {
+    id: "evt-2",
+    rowId: "task-2",
+    start: new Date(2024, 2, 5, 8, 0),
+    end: new Date(2024, 2, 15, 17, 0),
+    progress: 30,
+    dependencies: ["evt-1"],
+    meta: {
+      title: "Development",
+      description: "Build features",
+      class: "bg-emerald-500 rounded",
+    },
+  },
+]);
+</script>
 ```
 
-```js
-  /**
-   * Timeline data
-   */
-  const timelineData = ref<TimelineItem[]>([
-    {
-      row: 0,
-      background: "bg-emerald-500",
-      text: "text-white",
-      start: "17/02/2024 01:00",
-      end: "17/02/2024 02:00",
-      meta: { title: "Event 1", description: "Event 1 description" },
-    },
-    {
-      row: 1,
-      background: "bg-orange-500",
-      text: "text-white",
-      start: "17/02/2024 01:00",
-      end: "17/02/2024 02:15",
-      meta: { title: "Event 2", description: "Event 2 description" },
-    },
-    {
-      row: 1,
-      background: "bg-purple-500",
-      text: "text-white",
-      start: "17/02/2024 02:00",
-      end: "17/02/2024 03:15",
-      meta: { title: "Event 3", description: "Event 3 description" },
-    },
-    {
-      row: 3,
-      background: "bg-orange-500",
-      text: "text-white",
-      start: "17/02/2024 02:24",
-      end: "17/02/2024 03:27",
-      meta: { title: "Event 4", description: "Event 4 description" },
-    },
-    {
-      row: 4,
-      background: "bg-orange-500",
-      text: "text-white",
-      start: "18/02/2024 02:24",
-      end: "18/02/2024 03:27",
-      meta: { title: "Event 5", description: "Event 5 description" },
-    },
-    {
-      row: 5,
-      background: "bg-orange-500",
-      text: "text-white",
-      start: "18/02/2024 02:24",
-      end: "19/02/2024 03:27",
-      meta: { title: "Event 6", description: "Event 6 description" },
-    },
-  ]);
+## Props
 
-  /**
-   * Timeline headers
-   */
-  const timelineHeaders = ref(["Route", "Start time"]);
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `start` | `Date` | Yes | Timeline start date |
+| `end` | `Date` | Yes | Timeline end date |
+| `events` | `GanttEvent[]` | Yes | Array of events to display |
+| `rows` | `(GanttRow \| GanttGroup)[]` | No | Row/group definitions for the sidebar |
+| `headers` | `string[]` | Yes | Column headers for the sidebar |
+| `options` | `GanttOptions` | No | Display and behavior options |
 
-  /**
-   * Generate row data
-   */
-  const timelineItems = [
-    ["BMON-A", "08:00am"],
-    ["BMON-B", "08:00am"],
-    ["BMON-C", "08:00am"],
-    ["BMON-D", "08:00am"],
-    ["BMON-E", "08:00am"],
-    ["BMON-F", "08:00am"],
-    ["BMON-G", "08:00am"],
-  ];
+## Events
 
-  /**
-   * Timeline options
-   */
-  const timelineOptions = ref<TimelineOptions>({
-    cellWidth: 50,
-    row: {
-      height: 80,
-      marginTop: 4,
-    },
-    scale: 0.5,
-    start: "17/02/2024 00:00",
-    end: "19/02/2024 23:59",
-  });
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `event-click` | `EventClickPayload` | Event bar clicked |
+| `event-drag-end` | `EventDragPayload` | Event finished dragging |
+| `event-resize-end` | `EventResizePayload` | Event finished resizing |
+| `cell-click` | `CellClickPayload` | Empty grid cell clicked |
+| `group-toggle` | `groupId, collapsed` | Group expanded/collapsed |
+| `scale-change` | `scale` | Zoom level changed |
+| `event-select` | `eventId \| null` | Event selected/deselected |
+| `event-delete` | `GanttEvent` | Delete key pressed on selected event |
+
+## Data Types
+
+```typescript
+interface GanttEvent {
+  id: string;
+  rowId: string;
+  start: Date;
+  end: Date;
+  progress?: number;        // 0-100
+  isMilestone?: boolean;    // renders as diamond
+  dependencies?: string[];  // event IDs (draws arrows)
+  meta?: {
+    class?: string;         // Tailwind classes for styling
+    title?: string;
+    description?: string;
+    [key: string]: unknown;
+  };
+}
+
+interface GanttGroup {
+  id: string;
+  label: string;
+  collapsed?: boolean;
+  children?: (GanttRow | GanttGroup)[];  // supports deep nesting
+}
+
+interface GanttRow {
+  id: string;
+  columns: string[];
+}
+
+interface GanttOptions {
+  cellWidth?: number;       // default 100
+  rowHeight?: number;       // default 50
+  scale?: number;           // hours per cell
+  scaleUnit?: ScaleUnit;    // "minutes" | "hours" | "days" | "weeks" | "months"
+  timelineLevels?: GanttTimelineLevel[];
+  scrollSpeed?: number;     // wheel events before zoom
+  showCurrentTime?: boolean;
+  showHoverLine?: boolean;
+}
+```
+
+## Theming
+
+Override CSS variables on any parent element:
+
+```css
+.my-gantt {
+  --gantt-bg: #1e293b;
+  --gantt-header-bg: #334155;
+  --gantt-header-bg-alt: #1e293b;
+  --gantt-header-text: #e2e8f0;
+  --gantt-sidebar-bg: #334155;
+  --gantt-group-bg: #1e293b;
+  --gantt-group-text: #94a3b8;
+  --gantt-text-muted: #64748b;
+  --gantt-cell-bg: #0f172a;
+  --gantt-grid-border: #334155;
+}
+```
+
+## Tech Stack
+
+- **Vue 3** with `<script setup>` and Composition API
+- **TypeScript** with strict mode
+- **Tailwind CSS** for styling
+- **InteractJS** for drag and resize interactions
+- **Vite** for development and builds
+
+## Architecture
+
+```
+src/
+  types/gantt.ts              # All interfaces and helpers
+  composables/
+    useTimeline.ts            # Timeline generation, pixel math, zoom
+    useInteract.ts            # Drag/resize via InteractJS
+    useScrollSync.ts          # Synchronized scrolling
+  components/
+    GanttChart.vue            # Root orchestrator
+    GanttSidebar.vue          # Left column with groups
+    GanttTimeline.vue         # Multi-level timeline header
+    GanttGrid.vue             # Grid cells + event overlay
+    GanttEventBar.vue         # Single event bar
+    GanttDependencyLines.vue  # SVG dependency arrows
+    GanttCurrentTimeLine.vue  # Red "now" line
+    GanttHoverLine.vue        # Mouse-following line
 ```
 
 ## License
